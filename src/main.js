@@ -34,19 +34,38 @@ const app = document.querySelector("#app");
 const canvas = document.getElementById("chart-canvas");
 const ctx = canvas.getContext("2d");
 
+
 const width = canvas.width;
 const height = canvas.height;
+
+let max = sessions.pop().durationMinutes;
+for (const s of sessions) {
+    if (s.durationMinutes > max) {
+        max = s.durationMinutes;
+    }
+}
+
 const rectWidth = width / days;
+const relHeightPx = height * 0.75 / max;
+function rectHeight(value) {
+    return relHeightPx * value;
+}
+
+// TODO: rectangle height should be calculated relative to the height of the canvas so that everything fits nicely
+// The maximum tallest rectangle should be up to about 3/4 of the canvas
 
 // Returns x, y, widht, height
 function getRectArgs(index) {
     const value = filledSessions[index].durationMinutes;
     const x = index * rectWidth;
     const y = height - value;
+
+    // Left off here trying to figure out how to make the height relative so all rectangles are fully visible and some space is left up top
+    const relHeight = rectHeight(value);
+    console.log(value, relHeight);
+
     return {x, y, w: rectWidth, h: value};
 }
-
-// TODO: rectangle height should be calculated relative to the height of the canvas so that everything fits nicely
 
 // Draw rectangle for each date
 for (let i = 0; i < filledSessions.length; i++) {
