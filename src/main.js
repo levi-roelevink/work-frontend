@@ -18,6 +18,8 @@ const days = daysBetween(first, last) + 1;
 // Create sessions array without date gaps
 const filledSessions = arrayOfDatedObjects(first, days);
 
+// TODO: only put past 90 days in array, since 286 days causes the rectangles to be too narrow for pleasant viewing
+
 // Add duration to gapless array
 for (const session of sessions) {
     const index = daysBetween(first, session.date);
