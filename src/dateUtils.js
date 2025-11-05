@@ -9,3 +9,13 @@ export function daysBetween(a, b) {
     const ms = b - a;
     return ms / dayMs;
 }
+
+export function arrayOfDatedObjects(startDate, days) {
+    const array = [];
+
+    for (let i = 0; i < days; i++) {
+        const date = getDateWithOffset(startDate, i);
+        array.push({ date });
+    }
+    return array;
+}

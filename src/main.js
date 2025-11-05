@@ -1,5 +1,5 @@
 import { readJson } from "./fileReader";
-import { getDateWithOffset, daysBetween } from "./dateUtils";
+import { daysBetween, arrayOfDatedObjects } from "./dateUtils";
 
 const path = "../resources/session.json";
 
@@ -15,13 +15,8 @@ const first = sessions[0].date;
 const last = sessions[sessions.length - 1].date;
 const days = daysBetween(first, last) + 1;
 
-const filledSessions = [];
-
 // Create sessions array without date gaps
-for (let i = 0; i < days; i++) {
-    const date = getDateWithOffset(first, i);
-    filledSessions.push({ date });
-}
+const filledSessions = arrayOfDatedObjects(first, days);
 
 // Add duration to gapless array
 for (const session of sessions) {
@@ -46,13 +41,12 @@ for (const s of sessions) {
 }
 
 const rectWidth = width / days;
-const relHeightPx = height * 0.8 / max;
+
+// Rectangle height should be calculated relative to the height of the canvas so that everything fits nicely
+const relHeightPx = height * 0.8 / max; // The tallest rectangle will be 4/5 the height of the canvas
 function rectHeight(value) {
     return relHeightPx * value;
 }
-
-// TODO: rectangle height should be calculated relative to the height of the canvas so that everything fits nicely
-// The maximum tallest rectangle should be up to about 3/4 of the canvas
 
 // Returns x, y, widht, height
 function getRectArgs(index) {
@@ -60,12 +54,12 @@ function getRectArgs(index) {
     const relHeight = rectHeight(value);
     const x = index * rectWidth;
     const y = height - relHeight;
-    
-    return {x, y, w: rectWidth, h: relHeight};
+
+    return { x, y, w: rectWidth, h: relHeight };
 }
 
 // Draw rectangle for each date
 for (let i = 0; i < filledSessions.length; i++) {
-    const {x, y, w, h} = getRectArgs(i);
+    const { x, y, w, h } = getRectArgs(i);
     ctx.fillRect(x, y, w, h);
 }
