@@ -46,7 +46,7 @@ for (const s of sessions) {
 }
 
 const rectWidth = width / days;
-const relHeightPx = height * 0.75 / max;
+const relHeightPx = height * 0.8 / max;
 function rectHeight(value) {
     return relHeightPx * value;
 }
@@ -57,14 +57,11 @@ function rectHeight(value) {
 // Returns x, y, widht, height
 function getRectArgs(index) {
     const value = filledSessions[index].durationMinutes;
-    const x = index * rectWidth;
-    const y = height - value;
-
-    // Left off here trying to figure out how to make the height relative so all rectangles are fully visible and some space is left up top
     const relHeight = rectHeight(value);
-    console.log(value, relHeight);
-
-    return {x, y, w: rectWidth, h: value};
+    const x = index * rectWidth;
+    const y = height - relHeight;
+    
+    return {x, y, w: rectWidth, h: relHeight};
 }
 
 // Draw rectangle for each date
