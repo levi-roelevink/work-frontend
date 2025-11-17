@@ -7,19 +7,17 @@ const daysToDisplay = 90;
 // Read data
 const [data, error] = await readJson(path);
 let sessions = data.sessions;
-
 // Prepare data for chart
 sessions.map((s) => s.date = new Date(s.date));
-sessions.sort((a, b) => a.date - b.date);
 
 /**
  *
  * @param days in the past to start the array at
- * @returns An array without date gaps that contains the session objects between a specified amount of days in the past and today {[]}
+ * @returns An array without date gaps that contains the session objects between a specified amount of days in the past and today {[]}.
  */
-function previousXDaysSessions(days) {
+function previousXDaysSessions(days, sessions) {
     const today = new Date().setUTCHours(0, 0, 0, 0);
-    const dateDaysAgo = getDateWithOffset(today, - (days - 1));
+    const dateDaysAgo = getDateWithOffset(today, -(days - 1));
 
     // Create sessions array without date gaps
     const filledSessions = arrayOfDatedObjects(dateDaysAgo, days);
@@ -37,7 +35,7 @@ function previousXDaysSessions(days) {
     return filledSessions;
 }
 
-const filledSessions = previousXDaysSessions(daysToDisplay);
+const filledSessions = previousXDaysSessions(daysToDisplay, sessions);
 
 // Draw chart
 const app = document.querySelector("#app");
@@ -47,14 +45,10 @@ const ctx = canvas.getContext("2d");
 const width = canvas.width;
 const height = canvas.height;
 
-let max = filledSessions.pop().durationMinutes;
-for (const s of filledSessions) {
-    if (s.durationMinutes > max) {
-        max = s.durationMinutes;
-    }
-}
-
 const rectWidth = width / filledSessions.length;
+
+// Get maximum duration minutes value from sessions to use for setting the relative height of the rectangles in the chart
+const max = filledSessions.reduce((max, s) => s.durationMinutes > max ? s.durationMinutes : max, 0);
 
 // Rectangle height should be calculated relative to the height of the canvas so that everything fits nicely
 const relHeightPx = height * 0.8 / max; // The tallest rectangle will be 4/5 the height of the canvas
@@ -62,7 +56,11 @@ function rectHeight(value) {
     return relHeightPx * value;
 }
 
-// Returns x, y, width, height
+/**
+ *
+ * @param index of session in session array
+ * @returns {{x: number, y: number, w: number, h: *}}, x and y positions to draw at, width and height to use for drawing the rectangle.
+ */
 function getRectArgs(index) {
     const value = filledSessions[index].durationMinutes;
     const relHeight = rectHeight(value);
