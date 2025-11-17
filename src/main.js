@@ -37,19 +37,12 @@ function previousXDaysSessions(days, sessions) {
 
 const filledSessions = previousXDaysSessions(daysToDisplay, sessions);
 
-let totalMinutes = 0;
-for (const s of filledSessions) {
-    if (s.durationMinutes) {
-        totalMinutes += s.durationMinutes;
-    }
-}
-
-// const totalHours = filledSessions.reduce((s) => s.durationMinutes);
-const totalHours = Math.round(totalMinutes / 60);
-console.log(totalHours);
+const totalHours = Math.round(filledSessions.reduce((sum, s) => s.durationMinutes ? sum += s.durationMinutes : sum, 0) / 60);
 
 // Create chart
-const header = document.getElementById("chart-header").innerText = `${totalHours} hours in the previous ${daysToDisplay} days`;
+const header = document.getElementById("chart-header");
+header.innerText = `${totalHours} hours in the previous ${daysToDisplay} days`;
+
 const canvas = document.getElementById("chart-canvas");
 const ctx = canvas.getContext("2d");
 
