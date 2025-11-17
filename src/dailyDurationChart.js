@@ -1,5 +1,5 @@
-import {readJson} from "./fileReader";
-import {daysBetween, arrayOfDatedObjects, getDateWithOffset} from "./dateUtils";
+import { readJson } from "./fileReader";
+import { daysBetween, arrayOfDatedObjects, getDateWithOffset } from "./dateUtils";
 
 const path = "../resources/generatedSessions.json";
 const daysToDisplay = 90;
@@ -35,47 +35,49 @@ function previousXDaysSessions(days, sessions) {
     return filledSessions;
 }
 
-const filledSessions = previousXDaysSessions(daysToDisplay, sessions);
+export function doShit() {
+    const filledSessions = previousXDaysSessions(daysToDisplay, sessions);
 
-const totalHours = Math.round(filledSessions.reduce((sum, s) => s.durationMinutes ? sum += s.durationMinutes : sum, 0) / 60);
+    const totalHours = Math.round(filledSessions.reduce((sum, s) => s.durationMinutes ? sum += s.durationMinutes : sum, 0) / 60);
 
-// Create chart
-const header = document.getElementById("chart-header");
-header.innerText = `${totalHours} hours in the previous ${daysToDisplay} days`;
+    // Create chart
+    const header = document.getElementById("daily-chart-header");
+    header.innerText = `${totalHours} hours in the previous ${daysToDisplay} days`;
 
-const canvas = document.getElementById("chart-canvas");
-const ctx = canvas.getContext("2d");
+    const canvas = document.getElementById("daily-chart-canvas");
+    const ctx = canvas.getContext("2d");
 
-const width = canvas.width;
-const height = canvas.height;
+    const width = canvas.width;
+    const height = canvas.height;
 
-const rectWidth = width / filledSessions.length;
+    const rectWidth = width / filledSessions.length;
 
-// Get maximum duration minutes value from sessions to use for setting the relative height of the rectangles in the chart
-const max = filledSessions.reduce((max, s) => s.durationMinutes > max ? s.durationMinutes : max, 0);
+    // Get maximum duration minutes value from sessions to use for setting the relative height of the rectangles in the chart
+    const max = filledSessions.reduce((max, s) => s.durationMinutes > max ? s.durationMinutes : max, 0);
 
-// Rectangle height should be calculated relative to the height of the canvas so that everything fits nicely
-const relHeightPx = height * 0.8 / max; // The tallest rectangle will be 4/5 the height of the canvas
-function rectHeight(value) {
-    return relHeightPx * value;
-}
+    // Rectangle height should be calculated relative to the height of the canvas so that everything fits nicely
+    const relHeightPx = height * 0.8 / max; // The tallest rectangle will be 4/5 the height of the canvas
+    function rectHeight(value) {
+        return relHeightPx * value;
+    }
 
-/**
- *
- * @param index of session in session array
- * @returns {{x: number, y: number, w: number, h: *}}, x and y positions to draw at, width and height to use for drawing the rectangle.
- */
-function getRectArgs(index) {
-    const value = filledSessions[index].durationMinutes;
-    const relHeight = rectHeight(value);
-    const x = index * rectWidth;
-    const y = height - relHeight;
+    /**
+     *
+     * @param index of session in session array
+     * @returns {{x: number, y: number, w: number, h: *}}, x and y positions to draw at, width and height to use for drawing the rectangle.
+     */
+    function getRectArgs(index) {
+        const value = filledSessions[index].durationMinutes;
+        const relHeight = rectHeight(value);
+        const x = index * rectWidth;
+        const y = height - relHeight;
 
-    return {x, y, w: rectWidth, h: relHeight};
-}
+        return { x, y, w: rectWidth, h: relHeight };
+    }
 
-// Draw rectangle for each date
-for (let i = 0; i < filledSessions.length; i++) {
-    const {x, y, w, h} = getRectArgs(i);
-    ctx.fillRect(x, y, w, h);
+    // Draw rectangle for each date
+    for (let i = 0; i < filledSessions.length; i++) {
+        const { x, y, w, h } = getRectArgs(i);
+        ctx.fillRect(x, y, w, h);
+    }
 }
